@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace bookstore_api.Models
+namespace bookstore_api.Entities
 {
     public class Book
     {
-
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+
         public string Title { get; set; }
         public int GenreId { get; set; }
+        public Genre Genre { get; set; }
         public int PageCount { get; set; }
         public DateTime PublishDate { get; set; }
     }

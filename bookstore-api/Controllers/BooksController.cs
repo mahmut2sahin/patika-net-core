@@ -1,21 +1,14 @@
 ﻿using AutoMapper;
 using bookstore_api.Database;
-using bookstore_api.Operations.BookOperations.GetBooks;
-using bookstore_api.Operations.BookOperations.GetBookById;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using static bookstore_api.Operations.BookOperations.GetBookById.GetBookByIdService;
 using bookstore_api.Operations.BookOperations.AddBook;
-using static bookstore_api.Operations.BookOperations.AddBook.AddBookService;
-using bookstore_api.Operations.BookOperations.UpdateBook;
-using static bookstore_api.Operations.BookOperations.UpdateBook.UpdateBookService;
-using System.Security.Cryptography.X509Certificates;
 using bookstore_api.Operations.BookOperations.DeleteBook;
+using bookstore_api.Operations.BookOperations.GetBookById;
+using bookstore_api.Operations.BookOperations.GetBooks;
+using bookstore_api.Operations.BookOperations.UpdateBook;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using static bookstore_api.Operations.BookOperations.AddBook.AddBookService;
+using static bookstore_api.Operations.BookOperations.UpdateBook.UpdateBookService;
 
 namespace bookstore_api.Controllers
 {
@@ -43,19 +36,11 @@ namespace bookstore_api.Controllers
         [HttpGet("{id}")]
         public IActionResult GetBookById(int id)
         {
-            BookByIdViewModel result;
             GetBookByIdService service = new(context, mapper, id);
             GetBookByIdValidator validator = new();
-            try
-            {
-                validator.ValidateAndThrow(service);
-                result = service.Handle();
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
+            validator.ValidateAndThrow(service);
+            var result = service.Handle();
+            return Ok(result);
         }
 
         [HttpPost]
@@ -64,16 +49,9 @@ namespace bookstore_api.Controllers
             AddBookValidator validator = new();
             AddBookService service = new(context, mapper, newBook);
             int bookId;
-            try
-            {
-                validator.ValidateAndThrow(newBook);
-                bookId = service.Handle();
-                return CreatedAtAction(nameof(GetBookById), routeValues: new { id = bookId }, value: null);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            validator.ValidateAndThrow(service);
+            bookId = service.Handle();
+            return CreatedAtAction(nameof(GetBookById), routeValues: new { id = bookId }, value: null);
         }
 
         [HttpPut("{id}")]
@@ -81,33 +59,19 @@ namespace bookstore_api.Controllers
         {
             UpdateBookValidator validator = new();
             UpdateBookService service = new(context, mapper, updateBook, id);
-            try
-            {
-                validator.ValidateAndThrow(updateBook);
-                service.Handle();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            validator.ValidateAndThrow(service);
+            service.Handle();
+            return Ok();
         }
+
         [HttpDelete("{id}")]
         public IActionResult DeleteBook(int id)
         {
             DeleteBookService service = new(context, id);
             DeleteBookValidator validator = new();
-            try
-            {
-                validator.ValidateAndThrow(service);
-                service.Handle();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return NotFound(ex.Message);
-            }
+            validator.ValidateAndThrow(service);
+            service.Handle();
+            return Ok();
         }
     }
 }

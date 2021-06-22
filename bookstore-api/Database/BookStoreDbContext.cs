@@ -1,9 +1,5 @@
-﻿using bookstore_api.Models;
+﻿using bookstore_api.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace bookstore_api.Database
 {
@@ -11,8 +7,9 @@ namespace bookstore_api.Database
     {
         public BookStoreDbContext(DbContextOptions<BookStoreDbContext> options) : base(options)
         {
-
         }
+
         public DbSet<Book> Books { get; set; }
+        public DbSet<Genre> Genres { get; set; }
     }
 }

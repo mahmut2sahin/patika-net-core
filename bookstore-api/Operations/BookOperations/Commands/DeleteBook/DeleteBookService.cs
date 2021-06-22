@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using bookstore_api.Database;
+﻿using bookstore_api.Database;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace bookstore_api.Operations.BookOperations.DeleteBook
 {
@@ -25,8 +22,8 @@ namespace bookstore_api.Operations.BookOperations.DeleteBook
             {
                 throw new InvalidOperationException("Kitap bulunamadı!");
             }
-                context.Remove(book);
-                context.SaveChanges();
+            context.Remove(book);
+            context.SaveChanges();
         }
     }
 }

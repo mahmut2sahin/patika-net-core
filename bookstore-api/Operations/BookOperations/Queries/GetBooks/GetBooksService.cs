@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using bookstore_api.Database;
-using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace bookstore_api.Operations.BookOperations.GetBooks
 {
@@ -17,15 +16,17 @@ namespace bookstore_api.Operations.BookOperations.GetBooks
             this.context = context;
             this.mapper = mapper;
         }
-        
+
         public List<BooksViewModel> Handle()
         {
-            var bookList = context.Books.ToList();
+            var bookList = context.Books.Include(i => i.Genre).ToList();
             List<BooksViewModel> vm = mapper.Map<List<BooksViewModel>>(bookList);
             return vm;
         }
+
         public class BooksViewModel
         {
+            public int Id { get; set; }
             public string Title { get; set; }
             public string Genre { get; set; }
         }

@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
 using bookstore_api.Database;
-using bookstore_api.Models;
-using FluentValidation;
+using bookstore_api.Entities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Permissions;
-using System.Threading.Tasks;
 
 namespace bookstore_api.Operations.BookOperations.AddBook
 {
@@ -14,26 +10,29 @@ namespace bookstore_api.Operations.BookOperations.AddBook
     {
         private readonly BookStoreDbContext context;
         private readonly IMapper mapper;
+        public AddBookModel NewBookModel;
 
         public AddBookService(BookStoreDbContext context, IMapper mapper, AddBookModel newBook)
         {
             this.context = context;
             this.mapper = mapper;
-            this.NewBook = newBook;
+            this.NewBookModel = newBook;
         }
 
-        public AddBookModel NewBook { get; }
         public int Handle()
         {
-            var book = context.Books.FirstOrDefault(i => i.Title == NewBook.Title);
-            if (book is not null)
+            //var book = context.Books.Include(i => i.Genre).FirstOrDefault(i => i.Title == NewBookModel.Title);
+            bool BookCheck = context.Books.Any(i => i.Title == NewBookModel.Title);
+            bool GenreCheck = context.Genres.Any(i => i.Id == NewBookModel.GenreId);
+            if (BookCheck is false && GenreCheck is true)
             {
-                throw new InvalidOperationException("Kitap zaten mevcut");
+                Book newBook = mapper.Map<Book>(NewBookModel);
+                context.Add(newBook);
+                context.SaveChanges();
+                return newBook.Id;
             }
-            Book toBeAdded = mapper.Map<Book>(NewBook);
-            context.Add(toBeAdded);
-            context.SaveChanges();
-            return toBeAdded.Id;
+            else
+                throw new InvalidOperationException("Kitap zaten mevcut ya da belirtilen kitap türü sistemde kayıtlı değil!");
         }
 
         public class AddBookModel

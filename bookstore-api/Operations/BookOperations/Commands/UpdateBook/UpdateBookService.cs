@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
 using bookstore_api.Database;
-using bookstore_api.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using bookstore_api.Entities;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace bookstore_api.Operations.BookOperations.UpdateBook
 {
@@ -15,27 +11,28 @@ namespace bookstore_api.Operations.BookOperations.UpdateBook
         private readonly BookStoreDbContext context;
         private readonly IMapper mapper;
         private readonly int id;
+        public UpdateBookModel Model { get; }
 
         public UpdateBookService(BookStoreDbContext context, IMapper mapper, UpdateBookModel updatedBook, int id)
         {
             this.context = context;
             this.mapper = mapper;
             this.id = id;
-            this.UpdatedBook = updatedBook;
+            this.Model = updatedBook;
         }
-
-        public UpdateBookModel UpdatedBook { get; }
 
         public void Handle()
         {
             var book = context.Books.FirstOrDefault(i => i.Id == id);
-            if (book is null)
+            bool GenreCheck = context.Genres.Any(i => i.Id == Model.GenreId);
+            if (book is not null && GenreCheck is true)
             {
-                throw new InvalidOperationException("Böyle bir kitap yok!");
+                var updatedBook = mapper.Map<UpdateBookModel, Book>(Model, book);
+                context.Entry(book).CurrentValues.SetValues(updatedBook);
+                context.SaveChanges();
             }
-            var newbook = mapper.Map<UpdateBookModel, Book>(UpdatedBook, book);
-            context.Entry(book).CurrentValues.SetValues(newbook);
-            context.SaveChanges();
+            else
+                throw new InvalidOperationException("Böyle bir kitap yok ya da girilen kitap türü sistemde kayıtlı değil!");
         }
 
         public class UpdateBookModel

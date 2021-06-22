@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using bookstore_api.Database;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace bookstore_api.Operations.BookOperations.GetBookById
 {
@@ -20,11 +18,10 @@ namespace bookstore_api.Operations.BookOperations.GetBookById
             this.mapper = mapper;
             this.BookId = id;
         }
-        
 
         public BookByIdViewModel Handle()
         {
-            var book = context.Books.FirstOrDefault(i => i.Id == BookId);
+            var book = context.Books.Include(i => i.Genre).FirstOrDefault(i => i.Id == BookId);
             if (book is null)
             {
                 throw new InvalidOperationException("Kitap bulunamadı!");
@@ -35,11 +32,11 @@ namespace bookstore_api.Operations.BookOperations.GetBookById
 
         public class BookByIdViewModel
         {
+            public int Id { get; set; }
             public string Title { get; set; }
             public string Genre { get; set; }
             public int PageCount { get; set; }
             public string PublishDate { get; set; }
-
         }
     }
 }
